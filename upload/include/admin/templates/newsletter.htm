@@ -82,7 +82,21 @@ function checkUser(){
     <td class="Cnorm"><input type="text" name="bet" size="50"></td>
 </tr><tr>
     <td class="Cmite" valign="top" style="font-weight:bold;">Text</td>
-    <td class="Cnorm"><textarea cols="75" rows="25" name="txt"></textarea></td>
+    <td class="Cnorm">
+		<table>
+		<tr>
+			<td><textarea cols="75" rows="25" name="txt"></textarea></td>
+			<td align="top">
+				<div style="width:100%; height:400px; overflow:auto;"><table>
+				<tr>
+					<th colspan="2">User mit aktiviertem Newsletter</th>
+				</tr>
+				{nlaktivuser}
+				</table></div>
+			</td>
+		</tr>
+		</table>
+	</td>
 </tr><tr class="Cdark">
     <td>&nbsp;</td>
     <td>

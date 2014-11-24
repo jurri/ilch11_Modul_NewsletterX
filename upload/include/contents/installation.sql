@@ -6,11 +6,13 @@ CREATE TABLE `prefix_newsletter_send` (
 `nls_art` varchar(10),
 `nls_anzahl` int,
 PRIMARY KEY (`nls_pk`)
-)
+);
 
 CREATE TABLE `prefix_newsletter2user` (
 `nlu_pk` int NOT NULL AUTO_INCREMENT,
 `nlu_fknl` int NOT NULL,
 `nlu_fkuid` int NOT NULL,
 PRIMARY KEY (`nlu_pk`)
-)
+);
+
+insert into prefix_newsletter (select email from prefix_user);

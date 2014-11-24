@@ -15,11 +15,11 @@ if(isset($_POST['SEND']) and chk_antispam('newsletter', true)){
 	//-- Prüft und ermittelt an wen alles die Mail oder PM geschickt werden soll.
 	if($_POST['ch_one_user'] == 1){
 		$user = $_POST['s_user'];
-		$q = "SELECT DISTINCT email, name as uname, id as uid FROM prefix_user WHERE id = $user";
+		$q = "SELECT DISTINCT u.email, name as uname, id as uid FROM prefix_user u, prefix_newsletter n WHERE id = $user AND n.email = u.email";
 	}elseif($_POST['ch_all_recht'] == '1'){
-		$q = "SELECT DISTINCT email, name as uname, id as uid FROM prefix_user";
+		$q = "SELECT DISTINCT u.email, name as uname, id as uid FROM prefix_user u, prefix_newsletter n WHERE n.email = u.email";
 	}elseif($_POST['ch_all_gruppe'] == '1' AND $_POST['ch_all_recht'] == ''){
-		$q = "SELECT DISTINCT u.email, u.name as uname, u.id as uid FROM ic1_user u, ic1_groups g, ic1_groupusers gu WHERE u.id = gu.uid AND gu.gid = g.id";
+		$q = "SELECT DISTINCT u.email, u.name as uname, u.id as uid FROM ic1_user u, ic1_groups g, ic1_groupusers gu, prefix_newsletter n WHERE u.id = gu.uid AND gu.gid = g.id AND n.email = u.email";
 	}elseif($_POST['ch_all_gruppe'] == '' AND $_POST['ch_all_recht'] == ''){
 		$grecht = '';
 		for($i=0; $i<10; $i++){
@@ -31,7 +31,7 @@ if(isset($_POST['SEND']) and chk_antispam('newsletter', true)){
 				}
 			}
 		}
-		$q = "SELECT DISTINCT email, name as uname, id as uid FROM prefix_user WHERE recht IN ( $grecht )";
+		$q = "SELECT DISTINCT u.email, name as uname, id as uid FROM prefix_user u, prefix_newsletter n WHERE recht IN ( $grecht ) AND n.email = u.email";
 		
 		if($grecht == ''){
 			$groups = '';
@@ -45,7 +45,7 @@ if(isset($_POST['SEND']) and chk_antispam('newsletter', true)){
 					}
 				}
 			}
-			$q = "SELECT DISTINCT u.email, u.name as uname, u.id as uid FROM ic1_user u, ic1_groups g, ic1_groupusers gu WHERE u.id = gu.uid AND gu.gid IN ( $groups )";
+			$q = "SELECT DISTINCT u.email, u.name as uname, u.id as uid FROM ic1_user u, ic1_groups g, ic1_groupusers gu, prefix_newsletter n WHERE u.id = gu.uid AND n.email = u.email AND gu.gid IN ( $groups )";
 		}
 	}
 	$erg = db_query($q);
@@ -129,7 +129,7 @@ if(isset($_POST['SEND']) and chk_antispam('newsletter', true)){
 		}else{
 			//-- Checkbox Grundrechte
 			$ar['grecht'] = '';
-			$qry = db_query('SELECT ABS(id) as id, name FROM prefix_grundrechte ORDER BY id');
+			$qry = db_query('SELECT ABS(id) as id, name FROM prefix_grundrechte ORDER BY id');	
 			while($r = db_fetch_assoc($qry)){
 				$ar['grecht'] .= '<span style="white-space: nowrap; margin-right: 5px;"><input type="checkbox" id="grecht_'.$r['id'].'" name="grecht_'.$r['id'].'"/><label for="grecht_'.$r['id'].'">'.$r['name']."</label></span>\n";
 			}
@@ -148,6 +148,12 @@ if(isset($_POST['SEND']) and chk_antispam('newsletter', true)){
 				$ar['auser'] .= '<option value="'.$row['id'].'">'.$row['name'].'</option>';
 			}
 			$ar['auser'] .= '</select>';
+			
+			$erg_nl = db_query("SELECT u.* FROM prefix_newsletter n, prefix_user u WHERE n.email = u.email");
+			while($row = db_fetch_assoc($erg_nl)){
+				$ar['nlaktivuser'] .= '<tr><td>'.$row['name'].'</td><td>'.$row['email'].'</td></tr>';
+			}
+			
 			
 			$tpl->set_ar_out($ar, 0);
 		}
